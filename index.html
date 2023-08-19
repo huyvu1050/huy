@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #input:focus { outline: none; }
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; }
+      #messages > li:nth-child(odd) { background: #efefef; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Send</button>
+    </form>
+    // Nhúng thư viện Socket.io vào trang web
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+      // Khởi tạo một kết nối socket với máy chủ
+      var socket = io();
+    
+      // Lấy các phần tử HTML cần thiết để hiển thị tin nhắn và gửi tin nhắn mới
+      var messages = document.getElementById('messages');
+      var form = document.getElementById('form');
+      var input = document.getElementById('input');
+    
+      // Thêm sự kiện submit cho form để gửi tin nhắn mới
+      form.addEventListener('submit', function(e) {
+        // Ngăn chặn hành vi mặc định của form (tải lại trang)
+        e.preventDefault();
+        // Kiểm tra xem người dùng có nhập tin nhắn hay không
+        if (input.value) {
+          // Gửi tin nhắn đến máy chủ thông qua socket
+          socket.emit('chat message', input.value);
+          // Xóa nội dung trong ô nhập liệu
+          input.value = '';
+        }
+      });
+    
+      // Lắng nghe sự kiện 'chat message' từ máy chủ để hiển thị tin nhắn mới
+      socket.on('chat message', function(msg) {
+        // Tạo một phần tử li mới để hiển thị tin nhắn
+        var item = document.createElement('li');
+        item.textContent = msg;
+        // Thêm phần tử li vào danh sách tin nhắn
+        messages.appendChild(item);
+        // Cuộn trang xuống cuối để hiển thị tin nhắn mới nhất
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+    </script>
+    
+  </body>
+</html>
